@@ -1,0 +1,15 @@
+# Core
+flask>=2.3.0
+joblib>=1.3.0
+scikit-learn>=1.3.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Deep Learning (untuk Char-CNN) — opsional, hapus jika tidak pakai
+tensorflow>=2.13.0
+
+# Transformer (untuk XLM-R) — opsional, hapus jika tidak pakai
+torch>=2.0.0
+transformers>=4.35.0
+datasets>=2.14.0
+accelerate>=0.24.0
