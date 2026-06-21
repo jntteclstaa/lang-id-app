@@ -27,9 +27,9 @@ lang-id-app/
 ```
 
 ---
-# Dikarenakan models nya memiliki ukuran yang sangat besar, jadi sebelum di compile & run,
-# install terlebih dahulu untuk data models nya melalui google drive :
-# https://drive.google.com/file/d/1ZOT2tzNhvjoSe2GdVtdbxRBtKeZq_c3M/view?usp=sharing
+Dikarenakan models nya memiliki ukuran yang sangat besar, jadi sebelum di compile & run,
+install terlebih dahulu untuk data models nya melalui google drive :
+https://drive.google.com/file/d/1ZOT2tzNhvjoSe2GdVtdbxRBtKeZq_c3M/view?usp=sharing
 ---
 
 ## Setup di VS Code
