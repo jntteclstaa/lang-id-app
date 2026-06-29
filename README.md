@@ -1,4 +1,3 @@
-Ini yang siap paste:
 # Language Identification — Web App
 
 NLP Final Project · Group 3
