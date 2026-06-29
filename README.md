@@ -92,13 +92,33 @@ python download_models.py
 Setelah itu jalankan training:
 
 ```bash
+# Train semua model: classical + Char-CNN + XLM-R
 python train_and_save.py --data dataset.csv
+
+# Skip Char-CNN: lebih ringan karena tidak memakai TensorFlow
 python train_and_save.py --data dataset.csv --skip-cnn
+
+# Skip XLM-R: lebih cepat dan lebih hemat RAM karena tidak train transformer
 python train_and_save.py --data dataset.csv --skip-xlmr
+
+# Skip Char-CNN dan XLM-R: hanya train model classical
 python train_and_save.py --data dataset.csv --skip-cnn --skip-xlmr
 ```
 
 Model baru akan tersimpan di folder `models/`.
+
+Penjelasan opsi training:
+
+- `--skip-cnn` berarti tidak melatih model Char-CNN. Gunakan ini jika TensorFlow bermasalah atau ingin training lebih ringan.
+- `--skip-xlmr` berarti tidak melatih model XLM-RoBERTa. Gunakan ini jika tidak ada GPU, RAM terbatas, atau ingin training lebih cepat.
+- Tanpa skip berarti semua model dilatih, tetapi prosesnya paling lama dan paling berat.
+
+Rekomendasi optimal:
+
+- Untuk laptop biasa atau demo cepat: gunakan `--skip-cnn --skip-xlmr`.
+- Untuk hasil yang tetap kuat tetapi tidak terlalu berat: gunakan `--skip-xlmr`.
+- Untuk eksperimen lengkap dan mesin cukup kuat: jalankan tanpa skip.
+- Untuk free deployment: model classical paling aman karena lebih kecil, cepat, dan hemat RAM.
 
 ---
 
