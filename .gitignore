@@ -5,6 +5,7 @@ Thumbs.db
 # Dependency directories
 node_modules/
 venv/
+venv311/
 .env/
 
 # Python cache
@@ -16,6 +17,10 @@ __pycache__/
 dist/
 build/
 coverage/
+
+# Large trained model artifacts
+models/*
+!models/models_README.txt
 
 # Editor directories and files
 .vscode/

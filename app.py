@@ -21,6 +21,8 @@ warnings.filterwarnings("ignore")
 import joblib
 from flask import Flask, jsonify, render_template, request
 
+from download_models import download_models_if_needed
+
 MODELS_DIR = "models"
 app = Flask(__name__)
 
@@ -68,9 +70,16 @@ def load_model(model_key: str):
         _loaded_models[model_key] = ("sklearn", pipe)
 
     elif model_key == "char_cnn":
-        import tensorflow as tf
-        from tensorflow.keras.preprocessing.sequence import pad_sequences
-        from tensorflow.keras.preprocessing.text import tokenizer_from_json
+        try:
+            import tensorflow as tf
+            from tensorflow.keras.preprocessing.sequence import pad_sequences
+            from tensorflow.keras.preprocessing.text import tokenizer_from_json
+        except ImportError as exc:
+            raise RuntimeError(
+                "TensorFlow belum terinstall. Char-CNN membutuhkan Python 3.11/3.12, "
+                "lalu jalankan: pip install -r requirements.txt. "
+                "Untuk Python 3.14, gunakan model SVM/Naive Bayes/Logistic Regression."
+            ) from exc
 
         model_path = os.path.join(MODELS_DIR, "char_cnn.keras")
         tok_path   = os.path.join(MODELS_DIR, "char_cnn_tokenizer.json")
@@ -256,18 +265,24 @@ def models_status():
 
 
 if __name__ == "__main__":
-    print("\n🌐 Language Identification Web App")
-    print("   Buka browser di: http://localhost:5001\n")
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "5001"))
+    warmup_models = os.getenv("WARMUP_MODELS", "0") == "1"
 
-    # Warmup char_cnn saat startup supaya tidak lambat di request pertama
-    if check_model_exists("char_cnn"):
+    download_models_if_needed()
+
+    print("\n🌐 Language Identification Web App")
+    print(f"   Buka browser di: http://localhost:{port}\n")
+
+    # Optional warmup. Keep disabled on free deployments to avoid slow boots.
+    if warmup_models and check_model_exists("char_cnn"):
         print("  [warmup] Warming up Char-CNN...")
         loaded = load_model("char_cnn")
         _, keras_model, char_tok, le, meta = loaded
         predict_char_cnn(keras_model, char_tok, le, meta, "warmup text")
         print("  [warmup] ✅ Char-CNN ready\n")
     
-    if check_model_exists("xlmr"):
+    if warmup_models and check_model_exists("xlmr"):
         print("  [warmup] Warming up XLM-RoBERTa...")
         loaded = load_model("xlmr")
         _, model, tok, le, device = loaded
@@ -275,8 +290,8 @@ if __name__ == "__main__":
         print("  [warmup] ✅ XLM-RoBERTa ready\n")
 
     app.run(
-        host="0.0.0.0",
-        port=5001,
+        host=host,
+        port=port,
         debug=False,
         use_reloader=False
     )

@@ -1,108 +1,140 @@
+Ini yang siap paste:
 # Language Identification — Web App
 
 NLP Final Project · Group 3
 
 ## Struktur Folder
 
-```
+```text
 lang-id-app/
-├── train_and_save.py     ← Jalankan SEKALI untuk training
-├── app.py                ← Backend Flask (jalankan setiap mau pakai)
+├── download_models.py    ← Jalankan dulu untuk install/download model
+├── train_and_save.py     ← Jalankan hanya jika ingin training ulang
+├── app.py                ← Backend Flask
 ├── templates/
 │   └── index.html        ← Frontend web
-├── models/               ← Otomatis dibuat saat training
+├── models/               ← Berisi model hasil download/training
 │   ├── baseline_svm.joblib
 │   ├── naive_bayes.joblib
 │   ├── logistic_regression.joblib
 │   ├── svm.joblib
-│   ├── char_cnn/         ← Keras SavedModel
+│   ├── char_cnn.keras
 │   ├── char_cnn_tokenizer.json
 │   ├── char_cnn_label_encoder.pkl
 │   ├── char_cnn_meta.json
-│   ├── xlmr/             ← HuggingFace SavedModel
+│   ├── xlmr/
 │   ├── xlmr_label_encoder.pkl
-│   └── metrics.json      ← Tampil di web sebagai tabel perbandingan
-├── dataset.csv           ← ⚠ Taruh file dataset di sini
+│   └── metrics.json
+├── dataset.csv           ← Dataset training
 └── requirements.txt
 ```
 
 ---
-Dikarenakan models nya memiliki ukuran yang sangat besar, jadi sebelum di compile & run,
-install terlebih dahulu untuk data models nya melalui google drive :
-https://drive.google.com/file/d/1ZOT2tzNhvjoSe2GdVtdbxRBtKeZq_c3M/view?usp=sharing
 
 ## Setup di VS Code
 
 ### 1. Install dependensi
 
 ```bash
-# Buat virtual environment (disarankan)
 python -m venv venv
 source venv/bin/activate        # Mac/Linux
 venv\Scripts\activate           # Windows
 
-# Install packages
 pip install -r requirements.txt
 ```
 
-> Kalau tidak pakai Char-CNN, hapus baris `tensorflow` dari requirements.txt  
-> Kalau tidak pakai XLM-R, hapus baris `torch`, `transformers`, `datasets`, `accelerate`
+> Disarankan memakai Python 3.11 atau 3.12 agar TensorFlow/Char-CNN bisa berjalan.
 
 ---
 
-### 2. Taruh dataset
+### 2. Install/download models terlebih dahulu
 
-Copy file `dataset.csv` ke folder `lang-id-app/`.  
+Karena ukuran model besar, file model tidak disimpan langsung di repository.
+
+Sebelum menjalankan aplikasi atau melakukan training ulang, download model terlebih dahulu:
+
+```bash
+python download_models.py
+```
+
+Script ini akan otomatis:
+
+1. Mengecek apakah folder `models/` sudah lengkap
+2. Download model dari Google Drive jika belum ada
+3. Extract model ke folder `models/`
+4. Validasi file model yang dibutuhkan
+
+Link sumber model:
+
+```text
+https://drive.google.com/file/d/1ZOT2tzNhvjoSe2GdVtdbxRBtKeZq_c3M/view?usp=sharing
+```
+
+---
+
+### 3. Taruh dataset
+
+Copy file `dataset.csv` ke folder `lang-id-app/`.
+
 Dataset harus punya kolom `text` dan `language`.
 
 ---
 
-### 3. Training (sekali saja!)
+### 4. Training ulang jika diperlukan
+
+Training ulang hanya diperlukan jika ingin membuat model baru dari dataset.
+
+Pastikan models sudah diinstall/download terlebih dahulu:
 
 ```bash
-# Train semua model (termasuk Char-CNN dan XLM-R)
+python download_models.py
+```
+
+Setelah itu jalankan training:
+
+```bash
 python train_and_save.py --data dataset.csv
-
-# Skip Char-CNN (lebih cepat, tidak butuh TensorFlow)
 python train_and_save.py --data dataset.csv --skip-cnn
-
-# Skip XLM-R (lebih cepat, tidak butuh GPU)
 python train_and_save.py --data dataset.csv --skip-xlmr
-
-# Skip keduanya (hanya 4 model classical)
 python train_and_save.py --data dataset.csv --skip-cnn --skip-xlmr
 ```
 
-Model akan tersimpan di folder `models/`. **Tidak perlu training ulang** setiap restart.
+Model baru akan tersimpan di folder `models/`.
 
 ---
 
-### 4. Jalankan web app
+### 5. Jalankan web app
 
 ```bash
 python app.py
 ```
 
-Buka browser di: **http://localhost:5000**
+Buka browser di:
+
+```text
+http://localhost:5001
+```
+
+> Saat `python app.py` dijalankan, aplikasi juga akan otomatis mengecek dan mendownload model jika belum tersedia.
 
 ---
 
 ## Cara Pakai Web
 
-1. **Pilih model** — klik salah satu dari 6 card model di bagian atas
+1. **Pilih model** — klik salah satu card model di bagian atas
 2. **Masukkan teks** — bisa pakai demo pills atau ketik sendiri
 3. **Klik "Identifikasi Bahasa"** — atau tekan Ctrl+Enter
-4. Lihat hasil prediksi + top-5 confidence bars
+4. Lihat hasil prediksi dan top-5 confidence bars
 
 ---
 
 ## Tips
 
-- Model classical (SVM, NB, LR) sangat cepat (<1ms per prediksi)
-- Char-CNN butuh TensorFlow; load pertama kali agak lama (~5 detik)
-- XLM-R butuh RAM besar (~2GB); GPU opsional tapi disarankan
-- Model di-cache dalam memori setelah pertama kali diload — request berikutnya langsung cepat
-- Card model yang **abu-abu** berarti belum ditraining — jalankan `train_and_save.py` dulu
+- Jalankan `python download_models.py` sebelum training atau menjalankan aplikasi
+- Model classical (SVM, NB, LR) sangat cepat
+- Char-CNN membutuhkan TensorFlow dan disarankan memakai Python 3.11/3.12
+- XLM-R membutuhkan RAM besar dan load pertama kali lebih lama
+- Model di-cache dalam memori setelah pertama kali diload
+- Folder `models/` tidak perlu di-push ke Git karena ukurannya besar
 
 ---
 
@@ -110,9 +142,9 @@ Buka browser di: **http://localhost:5000**
 
 | Model | Type | N-gram |
 |-------|------|--------|
-| Baseline SVM | Classical | n=1 (unigram) |
+| Baseline SVM | Classical | n=1 |
 | Naive Bayes | Classical | n=2–3 |
 | Logistic Regression | Classical | n=2–3 |
-| SVM (n=2–3) | Classical | n=2–3 |
+| SVM | Classical | n=2–3 |
 | Char-CNN | Deep Learning | — |
 | XLM-RoBERTa | Transformer | — |

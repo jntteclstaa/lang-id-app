@@ -1,12 +1,14 @@
 # Core
 flask>=2.3.0
+gdown>=5.2.0
 joblib>=1.3.0
 scikit-learn>=1.3.0
 pandas>=2.0.0
 numpy>=1.24.0
 
-# Deep Learning (untuk Char-CNN) — opsional, hapus jika tidak pakai
-tensorflow>=2.13.0
+# Deep Learning (untuk Char-CNN)
+# TensorFlow belum support Python 3.14. Pakai Python 3.11/3.12 untuk Char-CNN.
+tensorflow>=2.16.0,<2.19.0; python_version < "3.13"
 
 # Transformer (untuk XLM-R) — opsional, hapus jika tidak pakai
 torch>=2.0.0
